@@ -258,7 +258,7 @@ def generate_image(format, size, stroke_width, colors, stream):
   # an array of CSS colors (or None for default colors), and an
   # output file-like object opened in binary mode.
 
-  import cairo
+  import cairocffi as cairo
   import colour
 
   # Generate image data.
@@ -282,7 +282,7 @@ def generate_image(format, size, stroke_width, colors, stream):
   if colors is None:
     colors = ("#FFF8F0", "#FCAA67", "#7DB7C0", "#932b25", "#498B57")
   for style in colors:
-      pat = cairo.LinearGradient (0.0, 0.0, 0.0, 1.0)
+      pat = cairo.LinearGradient(0.0, 0.0, 0.0, 1.0)
       for i, color in enumerate(style.split(',')):
         color = colour.Color(color)
         pat.add_color_stop_rgba (*([i] + list(color.rgb) + [1.0]))
@@ -320,7 +320,7 @@ def generate_image(format, size, stroke_width, colors, stream):
 
 # Entry point.
 
-if __name__ == "__main__":
+def main():
   def parse_width_height(s):
     ss = s.split("x")
     if len(ss) != 2: raise ValueError()
