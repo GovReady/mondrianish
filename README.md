@@ -1,5 +1,5 @@
-Mandorianish
-============
+Mondrianish
+===========
 
 A Python 3.x module that generates a [Piet Mondrian-style image](https://en.wikipedia.org/wiki/Piet_Mondrian#Paris_.281919.E2.80.931938.29)
 composed of rectangles of various colors and dark lines between them.
