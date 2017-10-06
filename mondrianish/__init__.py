@@ -35,6 +35,9 @@ def generate_grid(canvas_size, density=.5):
   # another, only adding valid lines, and then afterward to see
   # how those lines break up the canvas into rectangles.
 
+  if canvas_size[0] < 3 or canvas_size[1] < 3:
+    raise ValueError("Canvas size must be at least 3-by-3.")
+
   # Start constructing line segments iteratively.
   lines = []
   for i in range(int((canvas_size[0]*canvas_size[1])**density)):
@@ -209,6 +212,7 @@ def draw_as_ascii_art(canvas_size):
         ascii_art_rects[y][x] = fill_shapes[ascii_art_rects[y][x] % len(fill_shapes)]
   return "\n".join("".join(line) for line in ascii_art_rects)
 
+
 def generate_to_console_curses(args):
   # Generates a Mondrian-style image in grid form, then renders
   # it as ASCII art using line drawing characters and displays
@@ -263,6 +267,7 @@ def generate_image(format, size, stroke_width, colors, stream):
 
   # Generate image data.
   grid_size = (int(round(size[0]/stroke_width/7)), int(round(size[1]/stroke_width/7)))
+  if grid_size[0] < 3 or grid_size[1] < 3: raise ValueError("Stroke width is too large.")
   lines, rectangles = generate_grid(grid_size)
 
   # Prepare surface.
@@ -353,31 +358,43 @@ def main():
 
 # Flask entry point.
 try:
-  from flask import Flask, send_file, Response
+  from flask import Flask, send_file, Response, request
   app = Flask(__name__)
 
   @app.route("/image/<int:width>/<int:height>/<format>")
   def image_route(width, height, format):
-    if width < 0 or width > 4096: raise ValueError()
-    if height < 0 or height > 4096: raise ValueError()
+    try:
+      # Check incoming parameters.
+      if width < 0 or width > 4096: raise ValueError("width is out of range")
+      if height < 0 or height > 4096: raise ValueError("height is out of range")
 
-    if format == "text":
-      canvas_size = (width, height)
-      ascii_art = draw_as_ascii_art(canvas_size)
-      return Response(ascii_art, mimetype="text/plain; charset=UTF-8")
+      # Short-circuit for ASCII art output.
+      if format == "text":
+        canvas_size = (width, height)
+        ascii_art = draw_as_ascii_art(canvas_size)
+        return Response(ascii_art, mimetype="text/plain; charset=UTF-8")
 
-    stroke_width = int((width+height)**.5/10)+1
+      # Get additional parameters.
+      stroke_width = int(request.args.get("stroke-width", str(round(((width+height)**.5/10)+1))))
+      colors = None
+      if request.args.get("colors"):
+        colors = request.args.get("colors", "").split(";")
 
-    import io
-    buf = io.BytesIO()
-    generate_image(format, (width, height), stroke_width, None, buf)
-    buf.seek(0)
+      # Generate image.
+      import io
+      buf = io.BytesIO()
+      generate_image(format, (width, height), stroke_width, colors, buf)
+      buf.seek(0)
 
-    if format == "png":
-      mimetype = "image/png"
-    elif format == "svg":
-      mimetype = "image/svg+xml"
-    return send_file(buf, mimetype=mimetype)
+      # Form response.
+      if format == "png":
+        mimetype = "image/png"
+      elif format == "svg":
+        mimetype = "image/svg+xml"
+      return send_file(buf, mimetype=mimetype)
+
+    except ValueError as e:
+      return str(e)
 
 except ImportError:
   pass  
