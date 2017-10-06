@@ -122,10 +122,10 @@ drawing them on an image.
 
 You can also run it as a Flask app to create a little web server to serve generated images:
 
-	pip3 install Flask
+	pip3 install --upgrade Flask
 	FLASK_APP=mondrianish flask run
 
-Then visit `http://127.0.0.1:5000/image/{width}/{height}/{format}` to download images, like [http://127.0.0.1:5000/image/128/128/png](http://127.0.0.1:5000/image/1280/1280/png).
+Then visit `http://127.0.0.1:5000/image/{width}/{height}/{format}` to download images, like [http://127.0.0.1:5000/image/128/128/png](http://127.0.0.1:5000/image/128/128/png).
 
 ## Other Mondrian-like picture generators
 
