@@ -202,7 +202,7 @@ def draw_as_ascii_art_grid(canvas_size, lines, rectangles):
 
 def draw_as_ascii_art(canvas_size):
   lines, rectangles = generate_grid(canvas_size)
-  fill_shapes = "▤▥▦▧▨▩▮▬▯▭"
+  fill_shapes = "█▓▒░▮▯▞▙"
   ascii_art_lines, ascii_art_rects = draw_as_ascii_art_grid(canvas_size, lines, rectangles)
   for y in range(canvas_size[1]):
     for x in range(canvas_size[0]):
@@ -347,7 +347,9 @@ def main():
   if args.format == "console":
     generate_to_console_curses(args)
   elif args.format == "text":
-    print(draw_as_ascii_art((60, 20)))
+    if not args.size:
+      args.size = (60, 20)
+    print(draw_as_ascii_art(args.size))
   elif args.format in ("svg", "png"):
     if not args.size:
       args.size = (800, 600)
