@@ -22,8 +22,6 @@ line, and then afterward seeing how those lines break up the canvas into rectang
 
 ## Installation
 
-The module uses the `Cairo` 2D drawing library via `cairocffi`. See [cairocffi's installation instructions](http://cairocffi.readthedocs.io/en/latest/overview.html) if this doesn't work out of the box.
-
 To install this module:
 
 	pip3 install mondrianish

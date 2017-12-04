@@ -262,7 +262,6 @@ def generate_image(format, size, stroke_width, colors, stream):
   # an array of CSS colors (or None for default colors), and an
   # output file-like object opened in binary mode.
 
-  import cairocffi as cairo
   import colour
 
   # Generate image data.
@@ -272,31 +271,69 @@ def generate_image(format, size, stroke_width, colors, stream):
 
   # Prepare surface.
   if format == "png":
-    surface = cairo.ImageSurface(cairo.FORMAT_ARGB32, size[0], size[1])
+    from PIL import Image, ImageDraw
+    im = Image.new("RGBA", size)
+    draw = ImageDraw.Draw(im)
   elif format == "svg":
-    surface = cairo.SVGSurface(stream, size[0], size[1])
+    # Make a PIL.Image-like class.
+    class SvgImage:
+      def __init__(self, size):
+        self.data =  """<?xml version="1.0" encoding="UTF-8"?>\n"""
+        self.data += """<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink"
+        width="{}px" height="{}px" viewBox="0 0 {} {}" version="1.1">\n""".format(
+          size[0], size[1], size[0], size[1],
+        )
+        self.data += """<g id="surface1">\n"""
+      def save(self, buffer, *args):
+        self.data += """</g>\n"""
+        self.data += """</svg>\n"""
+        buffer.write(self.data.encode("utf8"))
+    class SvgDraw:
+      def __init__(self, im): self.im = im
+      def rectangle(self, coords, fill):
+        self.im.data += """<rect x="{x}" y="{y}" width="{width}" height="{height}" style="fill:{fill}" />\n""".format(
+          x=coords[0][0],
+          y=coords[0][1],
+          width=coords[1][0]-coords[0][0],
+          height=coords[1][1]-coords[0][1],
+          fill="rgb({},{},{})".format(*fill)
+        )
+      def line(self, coords, fill, width):
+        self.im.data += """<line x1="{x1}" y1="{y1}" x2="{x2}" y2="{y2}" style="stroke:{fill};stroke-width:{width}" />\n""".format(
+          x1=coords[0][0],
+          y1=coords[0][1],
+          x2=coords[1][0],
+          y2=coords[1][1],
+          fill="rgb({},{},{})".format(*fill),
+          width=width
+        )
+    im = SvgImage(size)
+    draw = SvgDraw(im)
   else:
-    raise ValueError("invalid format")
-
-  ctx = cairo.Context(surface)
+    raise ValueError("Invalid format: {}.".format(format))
 
   # Normalizing grid size to the canvas.
-  ctx.scale(size[0]/(grid_size[0]-1), size[1]/(grid_size[1]-1))
+  def scale_pt(p):
+    return (int(round(p[0] * size[0]/(grid_size[0]-1))),
+            int(round(p[1] * size[1]/(grid_size[1]-1))))
 
+  # Helper functions.
+  def draw_rectangle(box, color):
+    draw.rectangle([scale_pt(box[0]), scale_pt(box[1])], fill=color)
+  def draw_line(line, color, width):
+    draw.line([scale_pt(line[0]), scale_pt(line[1])], fill=color, width=width)
+
+  # Choose colors for the rectangles.
   fill_colors = []
   if colors is None:
     colors = ("#FFF8F0", "#FCAA67", "#7DB7C0", "#932b25", "#498B57")
-  for style in colors:
-      pat = cairo.LinearGradient(0.0, 0.0, 0.0, 1.0)
-      for i, color in enumerate(style.split(',')):
-        color = colour.Color(color)
-        pat.add_color_stop_rgba (*([i] + list(color.rgb) + [1.0]))
-      fill_colors.append(pat)
+  for color in colors:
+      color = colour.Color(color)
+      color = tuple([int(c*255) for c in color.rgb] + [255]) # => RGBA
+      fill_colors.append(color)
 
   # Draw rectangles.
   for i, rect in enumerate(rectangles):
-    ctx.rectangle(rect[0][0], rect[0][1], rect[1][0], rect[1][1])
-
     # Choose a color.
     if True:
       # Assign in a rotation.
@@ -307,20 +344,17 @@ def generate_image(format, size, stroke_width, colors, stream):
       for ii, color in enumerate(fill_colors): color_samples.extend([color]*(len(fill_colors)-ii)**2)
       color = random.choice(color_samples)
 
-    ctx.set_source(color)
-    ctx.fill()
+    # Draw.
+    draw_rectangle(rect, color)
 
   # Draw lines.
-  ctx.set_source_rgb(0.01, 0.02, 0.03) # Solid color
-  ctx.set_line_width(stroke_width/sum(size)*sum(grid_size))
+  color = (20, 30, 40, 255) # Solid color
+  width = int(round(stroke_width))
   for line in lines:
-    ctx.move_to(*line[0])
-    ctx.line_to(*line[1])
-    ctx.stroke()
+    draw_line(line, color, width)
 
   # Render.
-  if format == "png":
-    surface.write_to_png(stream)
+  return im.save(stream, format)
 
 
 # Entry point.
@@ -399,4 +433,7 @@ try:
       return str(e)
 
 except ImportError:
-  pass  
+  pass
+
+if __name__ == "__main__":
+  main()

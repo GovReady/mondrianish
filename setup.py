@@ -18,7 +18,7 @@ setup(name='mondrianish',
       license='CC0 1.0 Universal',
       packages=find_packages(),
       install_requires=[
-          'cairocffi',
+          'pillow',
           'colour',
       ],
       entry_points = {
