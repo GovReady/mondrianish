@@ -10,7 +10,7 @@ from setuptools import setup, find_packages
 # git push --tags
 
 setup(name='mondrianish',
-      version='0.5.2',
+      version='0.5.3',
       description='Generate Piet Mondrian-style images.',
       url='https://github.com/GovReady/mondrianish',
       author=u'GovReady PBC',
