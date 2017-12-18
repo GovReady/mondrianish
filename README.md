@@ -22,8 +22,6 @@ line, and then afterward seeing how those lines break up the canvas into rectang
 
 ## Installation
 
-The module uses the `Cairo` 2D drawing library via `cairocffi`. See [cairocffi's installation instructions](http://cairocffi.readthedocs.io/en/latest/overview.html) if this doesn't work out of the box.
-
 To install this module:
 
 	pip3 install mondrianish
@@ -130,3 +128,14 @@ Then visit `http://127.0.0.1:5000/image/{width}/{height}/{format}` to download i
 ## Other Mondrian-like picture generators
 
 For other generators, see [JEFworks/mondrian-generator](https://github.com/JEFworks/mondrian-generator) and her list.
+
+## Local development and testing
+
+To hack on Mondrianish, clone this repository and then install dependendies:
+
+	pip3 install -r requirements.txt
+
+Then run tests:
+
+	python3 test.py
+
