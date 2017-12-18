@@ -128,3 +128,14 @@ Then visit `http://127.0.0.1:5000/image/{width}/{height}/{format}` to download i
 ## Other Mondrian-like picture generators
 
 For other generators, see [JEFworks/mondrian-generator](https://github.com/JEFworks/mondrian-generator) and her list.
+
+## Local development and testing
+
+To hack on Mondrianish, clone this repository and then install dependendies:
+
+	pip3 install -r requirements.txt
+
+Then run tests:
+
+	python3 test.py
+

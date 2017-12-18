@@ -17,10 +17,7 @@ setup(name='mondrianish',
       author_email=u'jt@occams.info',
       license='CC0 1.0 Universal',
       packages=find_packages(),
-      install_requires=[
-          'pillow',
-          'colour',
-      ],
+      install_requires=open("requirements.txt").read().split("\n"),
       entry_points = {
         'console_scripts': ['mondrianish=mondrianish:main'],
       },

@@ -200,8 +200,8 @@ def draw_as_ascii_art_grid(canvas_size, lines, rectangles):
   return ascii_art_lines, ascii_art_rects
 
 
-def draw_as_ascii_art(canvas_size):
-  lines, rectangles = generate_grid(canvas_size)
+def draw_as_ascii_art(canvas_size, density=.4):
+  lines, rectangles = generate_grid(canvas_size, density=density)
   fill_shapes = "█▓▒░▮▯▞▙"
   ascii_art_lines, ascii_art_rects = draw_as_ascii_art_grid(canvas_size, lines, rectangles)
   for y in range(canvas_size[1]):
@@ -226,7 +226,7 @@ def generate_to_console_curses(args):
       canvas_size = (canvas_size[1], canvas_size[0]-1)
     else:
       canvas_size = args.size
-    lines, rectangles = generate_grid(canvas_size)
+    lines, rectangles = generate_grid(canvas_size, density=.3)
     ascii_art_lines, ascii_art_rects = draw_as_ascii_art_grid(canvas_size, lines, rectangles)
 
     # init colors
