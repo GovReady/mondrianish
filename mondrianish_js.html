@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+
+        <title>mondrianish.js example</title>
+
+        <style>
+            #container {
+                overflow: hidden;
+            }
+            #container .line {
+                border: .75vw solid black;
+            }
+            #container .cell.group0 {
+                background: #013c64;
+                border: 1px solid #013c64;
+            }
+            #container .cell.group1 {
+                background: #797d7e;
+                border: 1px solid #797d7e;
+            }
+        </style>
+    </head>
+    <body>
+        <div id="container">
+        </div>
+
+        <script src="https://code.jquery.com/jquery-3.1.1.slim.min.js" integrity="sha384-A7FZj7v+d/sdmMqp/nOQwliLvUsJfDHW+k9Omg/a/EheAdgtzNs3hpfag6Ed950n" crossorigin="anonymous"></script>
+        
+        <script src="mondrianish.js"></script>
+        
+        <script>
+            // resize handler
+            function update_size() {
+                $('#container').css({
+                    position: 'absolute',
+                    top: 0,
+                    left: 0,
+                    width: $(window).innerWidth()-2,
+                    height: $(window).innerHeight()-2 });
+            }
+            $(window).resize(update_size);
+            update_size();
+
+            // draw
+            
+            var container = $('#container');
+            var grid_width = 12;
+            var grid_height = parseInt(15*$(window).height()/$(window).width());
+            var ngroups = 3;
+            
+            var mondrian = generate_grid([grid_width+1, grid_height+1]);
+
+            mondrian.rectangles.forEach(function(rect) {
+                var node = $("<div class='cell'></div>");
+                node.css({
+                    position: 'absolute',
+                    left: (rect[0][0]/grid_width*100)+"%",
+                    top: (rect[0][1]/grid_height*100)+"%",
+                    width: ((rect[1][0]-rect[0][0])/grid_width*100)+"%",
+                    height: ((rect[1][1]-rect[0][1])/grid_height*100)+"%",
+                });
+                node.addClass("group" + parseInt(Math.random()*ngroups));
+                container.append(node);
+            });
+
+
+            mondrian.lines.forEach(function(line) {
+                var node = $("<div class='line'></div>");
+                node.css({
+                    position: 'absolute',
+                    left: (line[0][0]/grid_width*100)+"%",
+                    top: (line[0][1]/grid_height*100)+"%",
+                    width: ((line[1][0]-line[0][0])/grid_width*100)+"%",
+                    height: ((line[1][1]-line[0][1])/grid_height*100)+"%",
+                });
+                container.append(node);
+            });
+
+        </script>
+    </body>
+</html>

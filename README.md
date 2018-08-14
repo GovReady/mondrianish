@@ -10,6 +10,8 @@ structured this way. The technique here instead is to draw lines first, adding o
 horizontal and vertical lines that terminate at the edge of the canvas or at another
 line, and then afterward seeing how those lines break up the canvas into rectangles.
 
+This repository also contains a Javascript port [mondrianish.js](mondrianish.js) and [example](mondrianish_js.html).
+
 ---
 
 ![Sample](sample.png)
